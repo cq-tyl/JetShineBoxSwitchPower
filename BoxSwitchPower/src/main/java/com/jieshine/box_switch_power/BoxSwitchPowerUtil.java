@@ -1,10 +1,13 @@
 package com.jieshine.box_switch_power;
+
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.mjk.adplayer.utils.HardwareInterface;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +21,7 @@ import java.util.TimerTask;
 public class BoxSwitchPowerUtil {
     private static BoxSwitchPowerUtil boxSwitchPowerUtil;
     private static Context mContext;
+
     public static BoxSwitchPowerUtil getInstance() {
         if (boxSwitchPowerUtil != null)
             return boxSwitchPowerUtil;
@@ -26,13 +30,14 @@ public class BoxSwitchPowerUtil {
             return boxSwitchPowerUtil;
         }
     }
+
     //同步系统时间
     public void synSystemTime(int year, int month, int day, int hour, int minute, int second) {
         HardwareInterface.SetSystemTime(year, month, day, hour, minute, second);
     }
 
     //设置开机时间
-    public  void setStartTime(Context context, String startTime) {
+    public void setStartTime(Context context, String startTime) {
         mContext = context;
         TimerTask task = new TimerTask() {
             @Override
@@ -48,6 +53,7 @@ public class BoxSwitchPowerUtil {
             Toast.makeText(context, "开机时间解析异常", Toast.LENGTH_LONG).show();
         }
     }
+
     //设置关机时间
     public void setCloseTime(Context context, String closeTime) {
         mContext = context;
@@ -66,10 +72,10 @@ public class BoxSwitchPowerUtil {
         }
     }
 
-    private  Handler mHandler = new Handler() {
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            Log.e("tyl","systemTime="+getDate(System.currentTimeMillis()));
+            Log.e("tyl", "systemTime=" + getDate(System.currentTimeMillis()));
             if (msg.what == 1) {
                 openPower();
             } else if (msg.what == 2) {
@@ -79,29 +85,36 @@ public class BoxSwitchPowerUtil {
         }
     };
 
-    private  String getDate(long time) {
+    private String getDate(long time) {
         Date d = new Date(time);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(d);
     }
+    public void openPower(Context context) {
+        HardwareInterface.ShutUp(context);
+    }
+
+    public void closePower(Context context) {
+        HardwareInterface.ShutDown(context);
+    }
 
     //关机
-    private  void closePower() {
-        Log.e("tyl","closePower");
-        if (mContext!=null){
+    private void closePower() {
+        if (mContext != null) {
             HardwareInterface.ShutDown(mContext);
         }
     }
 
+
     //开机
-    private  void openPower() {
-        Log.e("tyl","openPower");
-        if (mContext!=null){
+    private void openPower() {
+        Log.e("tyl", "openPower");
+        if (mContext != null) {
             HardwareInterface.ShutUp(mContext);
         }
     }
 
-    private  Date strToDateLong(String strDate) {
+    private Date strToDateLong(String strDate) {
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = formatter.parse(strDate);

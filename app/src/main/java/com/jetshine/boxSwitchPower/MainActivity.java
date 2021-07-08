@@ -20,7 +20,8 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
             BoxSwitchPowerUtil.getInstance().setStartTime(MainActivity.this,"2021-07-05 12:03:00");
             BoxSwitchPowerUtil.getInstance().setStartTime(MainActivity.this,"2021-07-05 12:02:00");
-
+            BoxSwitchPowerUtil.getInstance().openPower(MainActivity.this);
+            BoxSwitchPowerUtil.getInstance().closePower(MainActivity.this);
         }
     };
 }
