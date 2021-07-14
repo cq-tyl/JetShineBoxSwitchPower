@@ -1,6 +1,7 @@
 package com.jieshine.box_switch_power;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -36,37 +37,55 @@ public class BoxSwitchPowerUtil {
         HardwareInterface.SetSystemTime(year, month, day, hour, minute, second);
     }
 
+
+    private Timer startTimer;
+    private TimerTask startTask;
     //设置开机时间
     public void setStartTime(Context context, String startTime) {
         mContext = context;
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                mHandler.sendEmptyMessage(1);
-            }
-        };
-        Timer timer = new Timer(true);
         Date date = strToDateLong(startTime);
         if (date != null) {
-            timer.schedule(task, date);
+            if (startTimer != null) {
+                startTimer.cancel();
+                startTimer=null;
+                startTask.cancel();
+                startTask=null;
+            }
+             startTask = new TimerTask() {
+                @Override
+                public void run() {
+                    mHandler.sendEmptyMessage(1);
+                }
+            };
+            startTimer = new Timer(true);
+            startTimer.schedule(startTask, date);
         } else {
             Toast.makeText(context, "开机时间解析异常", Toast.LENGTH_LONG).show();
         }
     }
 
-    //设置关机时间
+
+    private Timer closeTimer;
+    private  TimerTask closeTask;
+    //设置关机时间 多次同时间调用 会导致关机后立即开机
     public void setCloseTime(Context context, String closeTime) {
         mContext = context;
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                mHandler.sendEmptyMessage(2);
-            }
-        };
-        Timer timer = new Timer(true);
         Date date = strToDateLong(closeTime);
         if (date != null) {
-            timer.schedule(task, date);
+            if (closeTimer != null) {
+                closeTimer.cancel();
+                closeTimer=null;
+                closeTask.cancel();
+                closeTask=null;
+            }
+            closeTask = new TimerTask() {
+                @Override
+                public void run() {
+                    mHandler.sendEmptyMessage(2);
+                }
+            };
+            closeTimer = new Timer(true);
+            closeTimer.schedule(closeTask, date);
         } else {
             Toast.makeText(context, "关机时间解析异常", Toast.LENGTH_LONG).show();
         }
@@ -90,6 +109,7 @@ public class BoxSwitchPowerUtil {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(d);
     }
+
     public void openPower(Context context) {
         HardwareInterface.ShutUp(context);
     }
@@ -100,11 +120,11 @@ public class BoxSwitchPowerUtil {
 
     //关机
     private void closePower() {
+        Log.e("tyl", "closePower");
         if (mContext != null) {
             HardwareInterface.ShutDown(mContext);
         }
     }
-
 
     //开机
     private void openPower() {
@@ -130,6 +150,6 @@ public class BoxSwitchPowerUtil {
 //        Intent intent = new Intent(Intent.ACTION_MAIN);
 //        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        intent.addCategory(Intent.CATEGORY_HOME);
-//        startActivity(intent);
+//       mContext. startActivity(intent);
 //    }
 }
